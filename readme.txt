@@ -1,0 +1,1 @@
+GameVoting1.8.0dev. just copy folder and paste on server. any feedback are welcome.
