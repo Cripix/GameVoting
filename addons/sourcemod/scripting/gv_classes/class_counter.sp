@@ -8,6 +8,7 @@ methodmap GameVoting
 		#endif
 
 		Menu mymenu = new Menu(menu_handler);
+		mymenu.SetTitle(PLUGIN_TAG);
 		char Name[48], id[11];
 		for(int i=0;i<GetMaxClients();i++) {
 			if(player.valid(i)) {
@@ -27,8 +28,51 @@ methodmap GameVoting
 		return count;
 	}
 
+	public int get_cur_players() {
+		int num = 0;
+		for(int i=0;i<GetMaxClients();i++) 
+			if(player.valid(i)) num++;
+		return num;
+	}
+
 	public int get_needle_votes(int itype) {
-		return 10;
+		int percent = 75;
+		return (percent*this.get_cur_players())/100;
+	}
+
+	public int reset_votes_for_player(int client) {
+		for(int i=0;i<GetMaxClients();i++) {
+			if(player.valid(i)) {
+				if(g_player[i][vote_for][BAN_TYPE] == client) g_player[i][vote_for][BAN_TYPE] = 0;
+				if(g_player[i][vote_for][KICK_TYPE] == client) g_player[i][vote_for][KICK_TYPE] = 0;
+				if(g_player[i][vote_for][GAG_TYPE] == client) g_player[i][vote_for][GAG_TYPE] = 0;
+				if(g_player[i][vote_for][MUTE_TYPE] == client) g_player[i][vote_for][MUTE_TYPE] = 0;
+			}
+		}
+	}
+
+	public void do_Vacation(int itype, int client) {
+		if(!player.valid(client)) return;
+		switch(itype) {
+			case BAN_TYPE: {
+				this.reset_votes_for_player(client);
+				if(client > 0) {
+					ServerCommand("sm_ban #%d %d \"Gamevoting\"", GetClientUserId(client), ConVars[CONVAR_BAN_DURATION].IntValue);
+				} else {
+					ServerCommand("sm_ban #%d %d \"Gamevoting\"", GetClientUserId(client), ConVars[CONVAR_BAN_DURATION].IntValue);
+				}
+				PrintToChatAll("Player %N was banned by GameVoting.", client);
+			}
+			case KICK_TYPE: {
+				KickClient(client, "Kicked by GameVoting");
+			}
+			case GAG_TYPE: {
+				
+			}
+			case MUTE_TYPE: {
+				
+			}
+		}
 	}
 
 	public bool vote_for_player(int client, int victim, int itype) {
@@ -40,23 +84,12 @@ methodmap GameVoting
 		GetClientName(client, name1, sizeof(name1));
 		GetClientName(victim, name2, sizeof(name2));
 		switch(itype) {
-			case BAN_TYPE:  {
-				//PrintToChatAll("Player %N voted for ban %N (%d/%d)", client, victim, cur_votes,needle_votes);
-				PrintToChatAll("%t", "player_vote_for_ban", name1, name2, cur_votes, needle_votes);
-			}
-			case KICK_TYPE: {
-				//PrintToChatAll("Player %N voted for kick %N (%d/%d)", client, victim, cur_votes,needle_votes);
-				PrintToChatAll("%t", "player_vote_for_kick", name1, name2, cur_votes, needle_votes);
-			}
-			case GAG_TYPE:  {
-				//PrintToChatAll("Player %N voted for gag %N (%d/%d)", name1, name2, cur_votes,needle_votes);
-				PrintToChatAll("%t", "player_vote_for_mute", name1, name2, cur_votes, needle_votes);
-			}
-			case MUTE_TYPE: {
-				//PrintToChatAll("Player %N voted for mute %N (%d/%d)", name1, name2, cur_votes,needle_votes);
-				PrintToChatAll("%t", "player_vote_for_gag", name1, name2, cur_votes, needle_votes);
-			}
+			case BAN_TYPE: PrintToChatAll("%t", "player_vote_for_ban", name1, name2, cur_votes, needle_votes);
+			case KICK_TYPE: PrintToChatAll("%t", "player_vote_for_kick", name1, name2, cur_votes, needle_votes);
+			case GAG_TYPE: PrintToChatAll("%t", "player_vote_for_mute", name1, name2, cur_votes, needle_votes);
+			case MUTE_TYPE: PrintToChatAll("%t", "player_vote_for_gag", name1, name2, cur_votes, needle_votes);
 		}
+		if(cur_votes >= needle_votes) this.do_Vacation(itype, victim);
 		return true;
 	}
 

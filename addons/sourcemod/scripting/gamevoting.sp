@@ -1,30 +1,22 @@
+/***
+	GameVoting (sourcemod-1.8.0-git5967)
+	- Author: Vladimir Zhelnov (neatek.pw)
+	- 24.12.2016 - 17:19 (MSK)
+	- 1.8.2 - 25.12.2016 13:22 (MSK)
+***/
 #pragma semicolon 1
 #pragma newdecls required
-/*
-	GameVoting 1.8.0dev (sourcemod-1.8.0-git5967)
-	- Author: Vladimir Zhelnov (neatek.pw)
-	- 24.12.2016 - 17:19
-*/
-
-#define GV_DEBUG  1
-#define BAN_TYPE  0
-#define KICK_TYPE 1
-#define GAG_TYPE  2
-#define MUTE_TYPE 3
-#define BAN_COMMAND  "voteban"
-#define KICK_COMMAND "votekick"
-#define GAG_COMMAND  "votegag"
-#define MUTE_COMMAND "votemute"
-
+#include "gv_classes/defines.sp"
 enum Attributes {
-	vote_for[4],
-	current_type
+	vote_for[4], current_type
 }
 int g_player[MAXPLAYERS+1][Attributes];
+#include "gv_classes/convars.sp"
 #include "gv_classes/class_clients.sp"
 #include "gv_classes/class_counter.sp"
 public void OnPluginStart() {
 	LoadTranslations("gamevoting.txt");
+	register_ConVars();
 }
 public void OnClientPostAdminCheck(int client) {
 	gv.reset_votes(client);
@@ -38,7 +30,7 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	return Plugin_Continue;
 }
 public void CheckCommand(int client, const char[] args, const char[] pref) {
-	// !vote..? /vote..? vote..?
+	if(ConVars[CONVAR_ENABLED].IntValue < 1) return;
 	char command[24];
 	strcopy(command, sizeof(command), args);
 	TrimString(command);
