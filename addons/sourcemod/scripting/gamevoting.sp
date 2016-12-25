@@ -24,6 +24,7 @@ int g_player[MAXPLAYERS+1][Attributes];
 #include "gv_classes/class_clients.sp"
 #include "gv_classes/class_counter.sp"
 public void OnPluginStart() {
+	LoadTranslations("gamevoting.txt");
 }
 public void OnClientPostAdminCheck(int client) {
 	gv.reset_votes(client);
@@ -41,22 +42,20 @@ public void CheckCommand(int client, const char[] args, const char[] pref) {
 	char command[24];
 	strcopy(command, sizeof(command), args);
 	TrimString(command);
-	ReplaceString(command, sizeof(command), pref, "", true);
+	if(strlen(pref) > 0) ReplaceString(command, sizeof(command), pref, "", true);
 	if(StrEqual(command, BAN_COMMAND, false)) gv.show_menu(client,BAN_TYPE);
 	else if(StrEqual(command, KICK_COMMAND, false)) gv.show_menu(client,KICK_TYPE);
 	else if(StrEqual(command, GAG_COMMAND, false)) gv.show_menu(client,GAG_TYPE);
 	else if(StrEqual(command, MUTE_COMMAND, false)) gv.show_menu(client,MUTE_TYPE);
 }
 public int menu_handler(Menu menu, MenuAction action, int client, int item) {
-	if (action == MenuAction_Select) 
-	{
+	if (action == MenuAction_Select) {
 		char info[11];
 		GetMenuItem(menu, item, info, sizeof(info));
 		int victim = StringToInt(info);
 		gv.vote_for_player(client, victim, g_player[client][current_type]);
 	}
-	else if (action == MenuAction_End)
-	{
+	else if (action == MenuAction_End) {
 		CloseHandle(menu);
 	}
 }

@@ -32,12 +32,30 @@ methodmap GameVoting
 	}
 
 	public bool vote_for_player(int client, int victim, int itype) {
+		if(!player.valid(client) || !player.valid(victim)) return false;
 		g_player[client][vote_for][itype] = victim;
+		int needle_votes = this.get_needle_votes(itype);
+		int cur_votes = this.get_count_votes(victim,itype);
+		char name1[32],name2[32];
+		GetClientName(client, name1, sizeof(name1));
+		GetClientName(victim, name2, sizeof(name2));
 		switch(itype) {
-			case BAN_TYPE:  PrintToChatAll("Player %N voted for ban %N (%d/%d)", client, victim, this.get_count_votes(victim,BAN_TYPE),this.get_needle_votes(BAN_TYPE));
-			case KICK_TYPE: PrintToChatAll("Player %N voted for kick %N (%d/%d)", client, victim, this.get_count_votes(victim,KICK_TYPE),this.get_needle_votes(KICK_TYPE));
-			case GAG_TYPE:  PrintToChatAll("Player %N voted for gag %N (%d/%d)", client, victim, this.get_count_votes(victim,GAG_TYPE),this.get_needle_votes(GAG_TYPE));
-			case MUTE_TYPE: PrintToChatAll("Player %N voted for mute %N (%d/%d)", client, victim, this.get_count_votes(victim,MUTE_TYPE),this.get_needle_votes(MUTE_TYPE));
+			case BAN_TYPE:  {
+				//PrintToChatAll("Player %N voted for ban %N (%d/%d)", client, victim, cur_votes,needle_votes);
+				PrintToChatAll("%t", "player_vote_for_ban", name1, name2, cur_votes, needle_votes);
+			}
+			case KICK_TYPE: {
+				//PrintToChatAll("Player %N voted for kick %N (%d/%d)", client, victim, cur_votes,needle_votes);
+				PrintToChatAll("%t", "player_vote_for_kick", name1, name2, cur_votes, needle_votes);
+			}
+			case GAG_TYPE:  {
+				//PrintToChatAll("Player %N voted for gag %N (%d/%d)", name1, name2, cur_votes,needle_votes);
+				PrintToChatAll("%t", "player_vote_for_mute", name1, name2, cur_votes, needle_votes);
+			}
+			case MUTE_TYPE: {
+				//PrintToChatAll("Player %N voted for mute %N (%d/%d)", name1, name2, cur_votes,needle_votes);
+				PrintToChatAll("%t", "player_vote_for_gag", name1, name2, cur_votes, needle_votes);
+			}
 		}
 		return true;
 	}

@@ -1,0 +1,23 @@
+"Phrases"
+{
+	"player_vote_for_ban"
+	{
+		"#format"	"{1:s},{2:s},{3:d},{4:d}"
+		"en"		"Player {1} voted for ban {2} ({3}/{4})"
+	}
+	"player_vote_for_kick"
+	{
+		"#format"	"{1:s},{2:s},{3:d},{4:d}"
+		"en"		"Player {1} voted for kick {2} ({3}/{4})"
+	}
+	"player_vote_for_mute"
+	{
+		"#format"	"{1:s},{2:s},{3:d},{4:d}"
+		"en"		"Player {1} voted for mute {2} ({3}/{4})"
+	}
+	"player_vote_for_gag"
+	{
+		"#format"	"{1:s},{2:s},{3:d},{4:d}"
+		"en"		"Player {1} voted for gag {2} ({3}/{4})"
+	}
+}
